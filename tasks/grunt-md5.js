@@ -47,6 +47,7 @@ module.exports = function(grunt) {
           var destFile;
           var ext = '';
           var filename;
+          var filenameMD5;
           var srcCode = grunt.file.read(srcFile, {encoding: options.encoding});
 
           // keep extension unless you explicitly tell to not
@@ -59,10 +60,12 @@ module.exports = function(grunt) {
             basename = path.basename(srcFile, ext || path.extname(srcFile)) + '-';
           }
 
+          filenameMD5 = path.basename(srcFile, ext || path.extname(srcFile));
+
           filename = basename +
             require('crypto').
             createHash('md5').
-            update(srcCode, options.encoding).
+            update(filenameMD5, options.encoding).
             digest('hex') + ext;
 
           var regex = new RegExp(escapeRegExp(path.basename(srcFile)) + "$");
@@ -76,8 +79,11 @@ module.exports = function(grunt) {
           currentFile = {
             newPath: destFile,
             oldPath: srcFile,
-            content: srcCode
+            content: srcCode,
+            filename : filename
           };
+
+           // grunt.log.writeln('File \'' + currentFile.newPath); return;
 
           // for callback after each file
           if (_.isFunction(options.afterEach)) {
